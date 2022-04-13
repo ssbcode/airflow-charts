@@ -28,13 +28,13 @@ airflow:
   ## - use this command to generate your own fernet key:
   ##   python -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)"
   ##
-  fernetKey: "7T512UXSSmBOkpWimFHIVb8jK6lfmSAvx4mO6Arehnc="
+  fernetKey: "USJdDo6MgZoC7njscTh51_dj8PJ_C15-kScPO0UMzm8="
 
   ## the secret_key for flask (sets `AIRFLOW__WEBSERVER__SECRET_KEY`)
   ## - [WARNING] you must change this value to ensure the security of your airflow
   ## - set `AIRFLOW__WEBSERVER__SECRET_KEY` with `airflow.extraEnv` from a Secret to avoid storing this in your values
   ##
-  webserverSecretKey: "THIS IS UNSAFE!"
+  webserverSecretKey: "8HesphWA2LOPcCA_El06I40eb1RM1hknMqSfTKZxlFA="
 
   ## environment variables for airflow configs
   ## - airflow env-vars are structured: "AIRFLOW__{config_section}__{config_name}"
@@ -750,7 +750,7 @@ web:
     annotations: {}
     sessionAffinity: "None"
     sessionAffinityConfig: {}
-    type: ClusterIP
+    type: LoadBalancer
     externalPort: 8080
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
@@ -1813,7 +1813,7 @@ postgresql:
   ## - [WARNING] consider using an external database with `externalDatabase.*`
   ## - set to `false` if using `externalDatabase.*`
   ##
-  enabled: true
+  enabled: false
 
   ## the postgres database to use
   ##
@@ -1829,11 +1829,11 @@ postgresql:
 
   ## the name of a pre-created secret containing the postgres password
   ##
-  existingSecret: ""
+  existingSecret: airflow-postgres
 
   ## the key within `postgresql.existingSecret` containing the password string
   ##
-  existingSecretKey: "postgresql-password"
+  existingSecretKey: airflow-postgresql
 
   ## configs for the PVC of postgresql
   ##
@@ -1893,7 +1893,7 @@ externalDatabase:
 
   ## the host of the external database
   ##
-  host: localhost
+  host: pgs-airflowdev-psql.postgres.database.azure.com
 
   ## the port of the external database
   ##
@@ -1905,31 +1905,31 @@ externalDatabase:
 
   ## the username for the external database
   ##
-  user: airflow
+  user: airflow_user
 
   ## the name of a pre-created secret containing the external database user
   ## - if set, this overrides `externalDatabase.user`
   ##
-  userSecret: ""
+  #userSecret: "uUAcH3DmdSQPv1Mzew3rO1D6i"
 
   ## the key within `externalDatabase.userSecret` containing the user string
   ##
-  userSecretKey: "postgresql-user"
+  #userSecretKey: "airflow_user"
 
   ## the password for the external database
   ## - [WARNING] to avoid storing the password in plain-text within your values,
   ##   create a Kubernetes secret and use `externalDatabase.passwordSecret`
   ##
-  password: ""
+  password: "uUAcH3DmdSQPv1Mzew3rO1D6i"
 
   ## the name of a pre-created secret containing the external database password
   ## - if set, this overrides `externalDatabase.password`
   ##
-  passwordSecret: ""
+  #passwordSecret: ""
 
   ## the key within `externalDatabase.passwordSecret` containing the password string
   ##
-  passwordSecretKey: "postgresql-password"
+  #passwordSecretKey: "postgresql-password"
 
   ## extra connection-string properties for the external database
   ##
@@ -1937,7 +1937,7 @@ externalDatabase:
   ##   # require SSL (only for Postgres)
   ##   properties: "?sslmode=require"
   ##
-  properties: ""
+  properties: "?sslmode=require"
 
 ###################################
 ## DATABASE | Embedded Redis
@@ -1947,7 +1947,7 @@ redis:
   ## - set to `false` if `airflow.executor` is `KubernetesExecutor`
   ## - set to `false` if using `externalRedis.*`
   ##
-  enabled: true
+  enabled: false
 
   ## the redis password
   ##
@@ -1955,7 +1955,7 @@ redis:
 
   ## the name of a pre-created secret containing the redis password
   ##
-  existingSecret: ""
+  existingSecret: airflow-redis
 
   ## the key within `redis.existingSecret` containing the password string
   ##
@@ -2083,7 +2083,7 @@ redis:
 externalRedis:
   ## the host of the external redis
   ##
-  host: localhost
+  host: aircache.redis.cache.windows.net
 
   ## the port of the external redis
   ##
@@ -2097,7 +2097,8 @@ externalRedis:
   ## - [WARNING] to avoid storing the password in plain-text within your values,
   ##   create a Kubernetes secret and use `externalRedis.passwordSecret`
   ##
-  password: ""
+  password: "O4Ik6d7BXue8ii3Ds5S12rWfVIVI6g8a1AzCaCwDeUs="
+
 
   ## the name of a pre-created secret containing the external redis password
   ## - if set, this overrides `externalRedis.password`
@@ -2106,7 +2107,7 @@ externalRedis:
 
   ## the key within `externalRedis.passwordSecret` containing the password string
   ##
-  passwordSecretKey: "redis-password"
+  passwordSecretKey: ""
 
   ## extra connection-string properties for the external redis
   ##

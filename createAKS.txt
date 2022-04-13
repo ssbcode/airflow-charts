@@ -1,0 +1,17 @@
+kubectl delete ns airflow
+kubectl create ns airflow
+kubectl create secret generic airflow-postgres -n airflow --from-literal=postgres-password=$(openssl rand -base64 13)
+kubectl create secret generic airflow-redis -n airflow --from-literal=redis-password=$(openssl rand -base64 13)
+kubectl get secrets -n airflow
+helm dep update
+helm dep list
+helm install airflow  --namespace airflow --debug . 
+
+--dry-run <-- Make sure it looks good, no errors
+
+helm install airflow  --namespace airflow --debug . <-- This installs
+kubectl get pods -n airflow --watch  <-- This will watch all pods to make sure they are deployed
+
+Use these commands to port-forward the Services to your localhost:
+  * Airflow Webserver:  kubectl port-forward svc/airflow-web 8080:8080 --namespace airflow
+  * Flower Dashboard:   kubectl port-forward svc/airflow-flower 5555:5555 --namespace airflow
