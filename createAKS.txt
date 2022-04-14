@@ -5,7 +5,20 @@ kubectl create secret generic airflow-redis -n airflow --from-literal=redis-pass
 kubectl get secrets -n airflow
 helm dep update
 helm dep list
-helm install airflow  --namespace airflow --debug . 
+helm install airflow --namespace airflow --debug  .  \
+    --set config.webserver.expose_config=true
+    --set dags.gitSync.enabled=true \
+    --set dags.gitSync.repo=https://e31f6bbd36d80d5134e42e68c62da99ad7a493a3@github.com/ssbcode/airflow-repo.git \
+    --set dags.gitSync.branch=master \
+    --set dags.gitSync.subPath=dags \
+
+
+helm upgrade airflow --namespace airflow --debug  .  \
+    --set config.webserver.expose_config=true \
+    --set dags.gitSync.enabled=true \
+    --set dags.gitSync.repo=https://e31f6bbd36d80d5134e42e68c62da99ad7a493a3@github.com/ssbcode/airflow-repo.git \
+    --set dags.gitSync.branch=master \
+    --set dags.gitSync.subPath=dags 
 
 --dry-run <-- Make sure it looks good, no errors
 
