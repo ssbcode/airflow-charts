@@ -4,48 +4,40 @@
 
 # How to persist airflow logs?
 
-> 🟥 __Warning__ 🟥
+By default, logs are stored under `/opt/airflow/logs` within an [`emptyDir`](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) type Volume, 
+this means they only last as long as each airflow Pod resides on the same Node.
+
+We recommend that you chose one of the following options to ensure that past airflow logs remain accessible in your Web UI.
+
+## Option 1 - Persistent Volume Claim
+
+You may use a [`PersistentVolumeClaim`](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) to store your logs in a durable way.
+
+> 🟨 __Note__ 🟨
 >
-> For production, you should persist logs in a production deployment using one of these methods.
-> By default, logs are stored within the container's filesystem, therefore any restart of the pod will wipe your DAG logs.
+> You will need a [StorageClass](https://kubernetes.io/docs/concepts/storage/storage-classes/) that supports `ReadWriteMany` 
+> access mode to be already set up in your cluster:
+> 
+> - [check here for in-tree "Volume Plugins"](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) 
+> - [check here for "CSI Drivers"](https://kubernetes-csi.github.io/docs/drivers.html) 
 
-## Option 1 - persistent volume
+<details>
+<summary>
+  <a id="chart-managed-volume"></a>
+  <b>Chart Managed Volume</b>
+</summary>
 
-### Chart Managed Volume
+---
 
-For example, to have the chart create a PVC with the `storageClass` called `default` and an initial `size` of `1Gi`:
-
-```yaml
-scheduler:
-  logCleanup:
-    ## WARNING: scheduler log-cleanup must be disabled if `logs.persistence.enabled` is `true`
-    enabled: false
-
-workers:
-  logCleanup:
-    ## WARNING: workers log-cleanup must be disabled if `logs.persistence.enabled` is `true`
-    enabled: false
-
-logs:
-  ## NOTE: this is the default value
-  #path: /opt/airflow/logs
-  
-  persistence:
-    enabled: true
-
-    ## configs for the chart-managed volume
-    storageClass: "default" # NOTE: "" means cluster-default
-    size: 1Gi
-    accessMode: ReadWriteMany
-```
+The chart can manage the initial creation of a PersistentVolumeClaim for your logs.
 
 > 🟦 __Tip__ 🟦
 >
-> The name of the chart-managed volume will be `{{ .Release.Name | trunc 63 | trimSuffix "-" | trunc 58 }}-logs`.
+> The name of the `PersistentVolumeClaim` will be your helm release-name with `"-logs"` appended.
+> <br>
+> For example, if you use `helm install my-airflow ...`, the PVC will be called `my-airflow-logs`.
 
-### User Managed Volume
-
-For example, to use an existing PVC called `my-logs-pvc`:
+For example, to have the chart create a PersistentVolumeClaim with the `storageClass` called `default` and a `size` of `5Gi`:
 
 ```yaml
 scheduler:
@@ -60,62 +52,125 @@ workers:
 
 logs:
   ## NOTE: this is the default value
-  #path: /opt/airflow/logs
+  path: /opt/airflow/logs
   
   persistence:
     enabled: true
 
-    ## the name of your existing volume
+    ## NOTE: set `storageClass` to "" for the cluster-default
+    storageClass: "default"
+    
+    ## NOTE: some types of StorageClass will ignore this request (for example, EFS)
+    size: 5Gi
+    
+    ## WARNING: as multiple pods will write logs, this MUST be ReadWriteMany
+    accessMode: ReadWriteMany
+```
+
+</details>
+
+<details>
+<summary>
+  <a id="user-managed-volume"></a>
+  <b>User Managed Volume</b>
+</summary>
+
+---
+
+If you wish to take more control of the PersistentVolumeClaim used for your logs, you may create a 
+[`PersistentVolumeClaim`](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims) 
+resource inside your helm install namespace and then tell the chart to use it.
+
+For example, to have the chart use an existing PersistentVolumeClaim called `my-logs-pvc`:
+
+```yaml
+scheduler:
+  logCleanup:
+    ## WARNING: scheduler log-cleanup must be disabled if `logs.persistence.enabled` is `true`
+    enabled: false
+
+workers:
+  logCleanup:
+    ## WARNING: workers log-cleanup must be disabled if `logs.persistence.enabled` is `true`
+    enabled: false
+
+logs:
+  ## NOTE: this is the default value
+  path: /opt/airflow/logs
+  
+  persistence:
+    enabled: true
+
+    ## the name of your existing PersistentVolumeClaim
     existingClaim: my-logs-pvc
     
+    ## WARNING: as multiple pods will write logs, this MUST be ReadWriteMany
     accessMode: ReadWriteMany
 ```
 
+</details>
+
+## Option 2 - Remote Providers
+
+Many of the [Airflow Providers](https://airflow.apache.org/docs/apache-airflow-providers/) expose vendor-specific ways to write logs to durable storage,
+consult [the official catalog](https://airflow.apache.org/docs/apache-airflow-providers/core-extensions/logging.html) for a full list of logging extensions in remote providers.
+
+> 🟨 __Note__ 🟨
+>
+> Remote providers __only receive logs on task completion__ (including failure), this means two important things:
+> 
+> 1. logs of currently running tasks are not present in the remote provider
+> 2. if a worker crashes, the logs of currently running tasks will be lost (unless a file-system persistence is also enabled)
+
+> 🟥 __Warning__ 🟥
+>
+> These examples require Airflow 2.0+, if using Airflow 1.10, please consult the [Airflow 1.10.15 "Writing Logs" page](https://airflow.apache.org/docs/apache-airflow/1.10.15/howto/write-logs.html).
+
+<details>
+<summary>
+  <a id="s3-bucket"></a>
+  <b>S3 Bucket</b>
+</summary>
+
+---
+
+The `apache-airflow-providers-amazon` provider supports [remote logging into S3 buckets](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/logging/s3-task-handler.html).
+
 > 🟦 __Tip__ 🟦
 >
-> Your `logs.persistence.existingClaim` PVC must support `ReadWriteMany` for `accessMode`.
+> An `aws` type airflow connection called `my_aws` must exist for this example,
+> see our [guide using `airflow.connections`](../dags/airflow-connections.md#aws-connection) to do this.
 
-## Option 2 - remote cloud bucket
-
-### S3 Bucket (recommended on AWS)
-
-For example, to use a remote S3 bucket for logging (with an `airflow.connection` called `my_aws` for authorization):
+For example, to use an S3 bucket called `<<MY_BUCKET_NAME>>` under the object key prefix `airflow/logs` 
+with AWS access provided by an Airflow Connection called `my_aws`:
 
 ```yaml
 airflow:
   config:
     AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
-    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "s3://<<MY-BUCKET-NAME>>/airflow/logs"
+    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "s3://<<MY_BUCKET_NAME>>/airflow/logs"
     AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "my_aws"
-    
-  connections:
-    ## see docs: https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html
-    - id: my_aws
-      type: aws
-      description: my AWS connection
-      extra: |-
-        { "aws_access_key_id": "XXXXXXXX",
-          "aws_secret_access_key": "XXXXXXXX",
-          "region_name":"eu-central-1" }
 ```
 
-For example, to use a remote S3 bucket for logging (with [EKS - IAM Roles for Service Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) for authorization):
+</details>
 
-```yaml
-airflow:
-  config:
-    AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
-    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "s3://<<MY-BUCKET-NAME>>/airflow/logs"
-    AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "aws_default"
+<details>
+<summary>
+  <a id="google-cloud-storage"></a>
+  <b>Google Cloud Storage</b>
+</summary>
 
-serviceAccount:
-  annotations:
-    eks.amazonaws.com/role-arn: "arn:aws:iam::XXXXXXXXXX:role/<<MY-ROLE-NAME>>"
-```
+---
 
-### GCS Bucket (recommended on GCP)
+The `apache-airflow-providers-google` provider supports [remote logging into GCS buckets](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/logging/gcs.html).
 
-For example, to use a remote GCS bucket for logging (with an `airflow.connection` called `my_gcp` for authorization):
+> 🟦 __Tip__ 🟦
+>
+> A `google_cloud_platform` type airflow connection called `my_gcp` must exist for this example,
+> see our [guide using `airflow.connections`](../dags/airflow-connections.md#gcp-connection) to do this.
+
+For example, to use a GCS bucket called `<<MY_BUCKET_NAME>>` under the object key prefix `airflow/logs` 
+with GCP access provided by an Airflow Connection called `my_gcp`:
 
 ```yaml
 airflow:
@@ -123,27 +178,33 @@ airflow:
     AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
     AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "gs://<<MY-BUCKET-NAME>>/airflow/logs"
     AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "my_gcp"
-    
-  connections:
-    ## see docs: https://airflow.apache.org/docs/apache-airflow-providers-google/stable/connections/gcp.html
-    - id: my_gcp
-      type: google_cloud_platform
-      description: my GCP connection
-      extra: |-
-        { "extra__google_cloud_platform__keyfile_dict": "XXXXXXXX",
-          "extra__google_cloud_platform__num_retries": "5" }
 ```
 
-For example, to use a remote GCS bucket for logging (with [GKE - Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) for authorization):
+</details>
+
+<details>
+<summary>
+  <a id="azure-blob-storage"></a>
+  <b>Azure Blob Storage</b>
+</summary>
+
+---
+
+The `apache-airflow-providers-microsoft-azure` provider supports [remote logging into Azure Blob Storage](https://airflow.apache.org/docs/apache-airflow-providers-microsoft-azure/stable/logging/index.html).
+
+> 🟦 __Tip__ 🟦
+>
+> A `wabs` type airflow connection called `my_wabs` must exist for this example,
+> see our [guide using `airflow.connections`](../dags/airflow-connections.md#azure-blob-storage-connection) to do this.
+
+For example, to use Azure Blob Storage called `wasb-<<MY_NAME>>` with access provided by an Airflow Connection called `my_wabs`:
 
 ```yaml
 airflow:
   config:
     AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
-    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "gs://<<MY-BUCKET-NAME>>/airflow/logs"
-    AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "google_cloud_default"
-
-serviceAccount:
-  annotations:
-    iam.gke.io/gcp-service-account: "<<MY-ROLE-NAME>>@<<MY-PROJECT-NAME>>.iam.gserviceaccount.com"
+    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "wasb-<<MY_NAME>>"
+    AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "my_wabs"
 ```
+
+</details>

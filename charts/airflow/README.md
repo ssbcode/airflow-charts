@@ -1,16 +1,61 @@
-# Airflow Helm Chart (User Community)
+<h1 align="center">Airflow Helm Chart (User Community)</h1>
 
-[![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/airflow-helm)](https://artifacthub.io/packages/helm/airflow-helm/airflow)
+<br>
 
-The `User-Community Airflow Helm Chart` is the standard way to deploy [Apache Airflow](https://airflow.apache.org/) on [Kubernetes](https://kubernetes.io/) with [Helm](https://helm.sh/).
-Originally created in 2018, it has since helped thousands of companies create production-ready deployments of Airflow on Kubernetes.
+<p align="center">
+  The <code>User-Community Airflow Helm Chart</code> is the standard way to deploy <a href="https://airflow.apache.org/">Apache Airflow</a> on <a href="https://kubernetes.io/">Kubernetes</a> with <a href="https://helm.sh/">Helm</a>.
+  <br>
+  Originally created in 2018, it has since helped thousands of companies create production-ready deployments of Airflow on Kubernetes.
+</p>
 
-> If you appreciate the `User-Community Airflow Helm Chart` please consider supporting us!
+<p align="center">
+  <a href="https://github.com/airflow-helm/charts/releases">
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/airflow-helm/charts/total?style=flat-square&color=28a745">
+  </a>
+  <a href="https://github.com/airflow-helm/charts/graphs/contributors">
+    <img alt="Contributors" src="https://img.shields.io/github/contributors/airflow-helm/charts?style=flat-square&color=28a745">
+  </a>
+  <a href="https://github.com/airflow-helm/charts/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/airflow-helm/charts?style=flat-square&color=28a745">
+  </a>
+  <a href="https://github.com/airflow-helm/charts/releases">
+    <img alt="Latest Release" src="https://img.shields.io/github/v/release/airflow-helm/charts?style=flat-square&color=6f42c1&label=latest%20release">
+  </a>
+  <a href="https://artifacthub.io/packages/helm/airflow-helm/airflow">
+    <img alt="ArtifactHub" src="https://img.shields.io/static/v1?style=flat-square&color=417598&logo=artifacthub&label=ArtifactHub&message=airflow-helm">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/airflow-helm/charts/stargazers">
+    <img alt="GitHub Stars" src="https://img.shields.io/github/stars/airflow-helm/charts?style=for-the-badge&color=ffcb2f&label=Support%20with%20%E2%AD%90%20on%20GitHub">
+  </a>
+  <a href="https://artifacthub.io/packages/helm/airflow-helm/airflow">
+    <img alt="ArtifactHub Stars" src="https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=ffcb2f&label=Support%20with%20%E2%AD%90%20on%20ArtifactHub&query=stars&url=https://artifacthub.io/api/v1/packages/af52c9e8-afa6-4443-952f-3d4d17e3be35/stars">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/airflow-helm/charts/discussions">
+    <img alt="GitHub Discussions" src="https://img.shields.io/github/discussions/airflow-helm/charts?style=for-the-badge&color=17a2b8&label=Start%20a%20Discussion">
+  </a>
+  <a href="https://github.com/airflow-helm/charts/issues/new/choose">
+    <img alt="GitHub Issues" src="https://img.shields.io/github/issues/airflow-helm/charts?style=for-the-badge&color=17a2b8&label=Open%20an%20Issue">
+  </a>
+</p>
+
+<br>
+
+## History
+
+This project is independent from the official chart found in the `apache/airflow` GitHub repository, 
+and was previously known as `stable/airflow` when it was developed in the `helm/charts` GitHub repository.
+
+> ___✨ Message from the Maintainers ✨___
 >
-> - [give a ⭐ on GitHub](https://github.com/airflow-helm/charts/stargazers)
-> - [give a ⭐ on ArtifactHub](https://artifacthub.io/packages/helm/airflow-helm/airflow)
-
-> __NOTE:__ this project is independent of the official chart found in the `apache/airflow` GitHub repository, and is supported by the kind contributions of users like yourself!
+> _This project is primarily maintained by [@thesuperzapper](https://github.com/thesuperzapper) (Mathew Wicks),
+> an Independent Consultant who works with companies around the world on their Data and ML platforms,
+> feel free to [reach out](https://www.linkedin.com/in/mathewwicks/)!_
 
 ## Project Goals
 
@@ -26,57 +71,66 @@ Originally created in 2018, it has since helped thousands of companies create pr
 - Easily integrate with your `PostgresSQL` or `MySQL` databases ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/external-database.md))
 - Automatic deployment of `PgBouncer` to reduce PostgresSQL database strain ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/pgbouncer.md))
 - Declaratively manage Airflow configurations:
-   - Configs ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-configs.md))
+   - Config Files ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-configs.md))
    - Users ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/security/airflow-users.md))
    - Connections ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/airflow-connections.md))
    - Variables ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/airflow-variables.md))
    - Pools ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/airflow-pools.md))
 - Multiple ways to load your DAG definitions:
    - Git-Sync Sidecar ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/load-dag-definitions.md#option-1---git-sync-sidecar))
-   - Persistent Volume ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/load-dag-definitions.md#option-2---persistent-volume))
+   - Persistent Volume Claim ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/load-dag-definitions.md#option-2---persistent-volume-claim))
    - Embedded Into Container Image ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/load-dag-definitions.md#option-3---embedded-into-container-image))
+- Multiple ways to persist your logs:
+   - Persistent Volume Claim ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/log-persistence.md#option-1---persistent-volume-claim))
+   - Remote Providers ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/log-persistence.md#option-2---remote-providers))
 - Multiple ways to install extra Python packages:
-   - Init-Containers ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/extra-python-packages.md#option-1---use-init-containers))
-   - Embedded Into Container Image ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/extra-python-packages.md#option-2---embedded-into-container-image-recommended))
-- Automatic restarting of unhealthy Airflow Schedulers ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/scheduler-liveness-probe.md))
-- Automatic clean up of old airflow logs ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/log-cleanup.md))
+   - Init-Containers ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/extra-python-packages.md#option-1---init-containers))
+   - Embedded Into Container Image ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/extra-python-packages.md#option-2---embedded-into-container-image))
+- Automatically restart unhealthy Airflow Schedulers:
+   - Heartbeat Check ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/scheduler-liveness-probe.md#scheduler-heartbeat-check))
+   - Task Creation Check ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/scheduler-liveness-probe.md#scheduler-task-creation-check))
+- Automatically remove old airflow logs ([docs](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/log-cleanup.md))
 - Out-of-the-box Support for `ArgoCD` and similar tools
 - Personalised tips/warnings after each `helm upgrade`
 
+<br>
+
 ## Guides
 
-- [`"Quickstart Guide"`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/guides/quickstart.md) <a id="quickstart-guide"></a>
-- [`"Upgrade Guide"`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/guides/upgrade.md) <a id="upgrade"></a>
-- [`"Uninstall Guide"`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/guides/uninstall.md) <a id="uninstall"></a>
+#### [`Quickstart Guide`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/guides/quickstart.md) <sup><sub>⭐</sub></sup> <a id="quickstart-guide"></a>
+
+#### [`Upgrade Guide`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/guides/upgrade.md) <sup><sub>⭐</sub></sup> <a id="upgrade"></a>
+
+#### [`Uninstall Guide`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/guides/uninstall.md) <a id="uninstall"></a>
 
 ## Frequently Asked Questions
 
 - __Configuration:__
-  - [`How to choose the airflow version?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-version.md) <a id="how-to-use-a-specific-version-of-airflow"></a>
-  - [`How to set airflow configs?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-configs.md) <a id="how-to-set-airflow-configs"></a>
+  - [`How to choose the airflow version?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-version.md) <sup><sub>⭐</sub></sup> <a id="how-to-use-a-specific-version-of-airflow"></a>
+  - [`How to set airflow configs?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-configs.md) <sup><sub>⭐</sub></sup> <a id="how-to-set-airflow-configs"></a>
   - [`How to load airflow plugins?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-plugins.md)
   - [`How to install extra python packages?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/extra-python-packages.md) <a id="how-to-install-extra-pip-packages"></a>
   - [`How to configure autoscaling for celery workers?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/autoscaling-celery-workers.md) <a id="how-to-set-up-celery-worker-autoscaling"></a>
 - __DAGs:__
-  - [`How to load DAG definitions?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/load-dag-definitions.md) <a id="how-to-store-dags"></a>
-  - [`How to manage airflow connections?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/airflow-connections.md) <a id="how-to-create-airflow-connections"></a>
+  - [`How to load DAG definitions?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/load-dag-definitions.md) <sup><sub>⭐</sub></sup> <a id="how-to-store-dags"></a>
+  - [`How to manage airflow connections?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/airflow-connections.md) <sup><sub>⭐</sub></sup> <a id="how-to-create-airflow-connections"></a>
   - [`How to manage airflow variables?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/airflow-variables.md) <a id="how-to-create-airflow-variables"></a>
   - [`How to manage airflow pools?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/dags/airflow-pools.md) <a id="how-to-create-airflow-pools"></a>
 - __Security:__
-  - [`How to manage airflow users?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/security/airflow-users.md) <a id="how-to-create-airflow-users"></a>
+  - [`How to manage airflow users?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/security/airflow-users.md) <sup><sub>⭐</sub></sup> <a id="how-to-create-airflow-users"></a>
   - [`How to integrate airflow with LDAP or OAUTH?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/security/ldap-oauth.md) <a id="how-to-authenticate-airflow-users-with-ldapoauth"></a>
   - [`How to set the fernet encryption key?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/security/set-fernet-key.md) <a id="how-to-set-a-custom-fernet-encryption-key"></a>
   - [`How to set the webserver secret key?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/security/set-webserver-secret-key.md) <a id="how-to-set-a-custom-webserver-secret_key"></a>
 - __Monitoring:__
-  - [`How to persist airflow logs?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/log-persistence.md) <a id="how-to-persist-airflow-logs"></a>
+  - [`How to persist airflow logs?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/log-persistence.md) <sup><sub>⭐</sub></sup> <a id="how-to-persist-airflow-logs"></a>
   - [`How to automatically clean up airflow logs?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/log-cleanup.md)
   - [`How to configure the scheduler liveness probe?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/scheduler-liveness-probe.md) <a id="how-to-configure-the-scheduler-liveness-probe"></a>
   - [`How to integrate airflow with Prometheus?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/monitoring/prometheus.md) <a id="how-to-integrate-airflow-with-prometheus"></a>
 - __Databases:__
   - [`How to configure the embedded database?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/embedded-database.md) <a id="how-to-use-the-embedded-postgres"></a>
   - [`How to configure the embedded redis?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/embedded-redis.md)
-  - [`How to configure an external database?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/external-database.md) <a id="how-to-use-an-external-database"></a>
-  - [`How to configure an external redis?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/external-redis.md) <a id="how-to-use-an-external-redis"></a>
+  - [`How to configure an external database?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/external-database.md) <sup><sub>⭐</sub></sup> <a id="how-to-use-an-external-database"></a>
+  - [`How to configure an external redis?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/external-redis.md) <sup><sub>⭐</sub></sup> <a id="how-to-use-an-external-redis"></a>
   - [`How to configure pgbouncer?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/database/pgbouncer.md)
 - __Kubernetes:__
   - [`How to set up a kubernetes ingress?`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/kubernetes/ingress.md) <a id="how-to-set-up-an-ingress"></a>
@@ -88,48 +142,47 @@ Originally created in 2018, it has since helped thousands of companies create pr
 
 ## Examples
 
-The following table contains example deployments of the `User-Community Airflow Helm Chart`.
+- __Custom Values Starting Points:__
+  - [`CeleryExecutor`](sample-values-CeleryExecutor.yaml)
+  - [`KubernetesExecutor`](sample-values-KubernetesExecutor.yaml)
+  - [`CeleryKubernetesExecutor`](sample-values-CeleryKubernetesExecutor.yaml)
+- __Real-World Examples:__
+  - [`Minikube / Kind / K3D`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/examples/minikube)
+  - [`Google Kubernetes Engine (GKE)`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/examples/google-gke)
 
-Example | Deployment Environment | Airflow Version | Airflow Executor
---- | --- | --- | ---
-[minikube](https://github.com/airflow-helm/charts/tree/main/charts/airflow/examples/minikube) | `Minikube` or `Kind` or `K3D` | `1.10+` or `2.0+` | `CeleryExecutor`
-[google-gke](https://github.com/airflow-helm/charts/tree/main/charts/airflow/examples/google-gke) | `Google Cloud - GKE` | `1.10+` or `2.0+` | `CeleryExecutor`
+<br>
 
 ## Airflow Version Support
 
-> __TIP:__ you may use any supported airflow version by [defining the appropriate `airflow.image.tag` value](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-version.md)
-
-The following versions of airflow are supported by the User-Community Airflow Helm Chart.
+The following table lists the __airflow versions__ supported by this chart (set by [`airflow.image.tag`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/docs/faq/configuration/airflow-version.md) value).
 
 Chart Version → <br> Airflow Version ↓  | `7.0.0` - `7.16.0` | `8.0.0` - `8.5.3` | `8.6.0+` |
 --- | --- | --- | ---
-`1.10.X` | ✅ | ⚠️ <sub>[1]</sub> | ⚠️ <sub>[1]</sub>
-`2.0.X` | ❌ | ✅ | ✅️
-`2.1.X` | ❌ | ✅ | ✅️
-`2.2.X` | ❌ | ⚠️ <sub>[2]</sub> | ✅️
+`1.10.X` | ✔️ | ⚠️ <sub>[1]</sub> | ⚠️ <sub>[1]</sub>
+`2.0.X` | ❌ | ✔️ | ✔️
+`2.1.X` | ❌ | ✔️ | ✔️
+`2.2.X` | ❌ | ⚠️ <sub>[2]</sub> | ✔️️
 
 <sub>[1] you must set `airflow.legacyCommands = true` when using airflow version `1.10.X`</sub><br>
 <sub>[2] the [Deferrable Operators & Triggers](https://airflow.apache.org/docs/apache-airflow/stable/concepts/deferring.html) feature won't work, as there is no `airflow triggerer` Deployment</sub>
 
 ## Airflow Executor Support
 
-> __TIP:__ you may use any supported airflow executor type by defining the appropriate `airflow.executor` value
-
-The following airflow executor types are supported by the User-Community Airflow Helm Chart.
+The following table lists the [__airflow executors__](https://airflow.apache.org/docs/apache-airflow/stable/executor/index.html) supported by this chart (set by `airflow.executor` value).
 
 Chart Version → <br> Airflow Executor ↓ | `7.X.X` | `8.X.X` | 
 --- | --- | ---
-`CeleryExecutor` | ✅ | ✅
-`KubernetesExecutor` | ⚠️️ <sub>[1]</sub> | ✅
-`CeleryKubernetesExecutor` | ❌ | ✅
+`CeleryExecutor` | ✔️ | ✔️
+`KubernetesExecutor` | ⚠️️ <sub>[1]</sub> | ✔️
+`CeleryKubernetesExecutor` | ❌ | ✔️
 
 <sub>[1] we encourage you to use chart version `8.X.X`, so you can use the `airflow.kubernetesPodTemplate.*` values (requires airflow `1.10.11+`) </sub>
 
 ## Helm Values
 
-> __TIP:__ the full list of values can be found in the [default `values.yaml` file](https://github.com/airflow-helm/charts/tree/main/charts/airflow/values.yaml)
+The following is a summary of the __helm values__ provided by this chart (see full list in [`values.yaml`](https://github.com/airflow-helm/charts/tree/main/charts/airflow/values.yaml) file).
 
-The following is a summary of the __helm values__ provided by the User-Community Airflow Helm Chart.
+> click the `▶` symbol to expand
 
 <details>
 <summary><code>airflow.*</code></summary>
